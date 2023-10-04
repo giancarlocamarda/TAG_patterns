@@ -80,7 +80,7 @@ mu |>
   geom_line()
 "Baseline Logrates"
 
-spain3 <- 
+spain4 <- 
   big_test |> 
   select(-up, -low) |> 
   filter(Country == "Spain", 
@@ -97,10 +97,10 @@ spain3 <-
   ggplot(aes(x = Age+2.5, y = `Excess Deaths`)) +
   geom_col(width=5,alpha=.4) +
   theme_minimal() +
-  theme(axis.text = element_text(size=14),
-        axis.title = element_text(size = 16))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 18))+
   labs(x = "Age")
-ggsave("Figures/spain3.pdf",spain3)
+ggsave("Figures/spain4.pdf",spain4)
 
 pull(type) |> unique()
 b <- big_test |> filter(Country == "Spain", 
@@ -178,6 +178,47 @@ big_test |>
 ggsave("Figures/spain2.pdf",spain2)
 
 big_test |> 
+  pull(type) |> unique()
+spain3 <-
+  big_test |> 
+  filter(Country == "Spain",
+         Sex == "female",
+         type %in% c("Exp Delta","Exp c"),
+         years == 2020) |> 
+  pivot_wider(names_from = "type",
+              values_from = "value")
+  
+  ggplot(aes(x = ages,
+             y = value,
+             ymax = up,
+             ymin = low)) +
+  geom_line(color = rgb(1, .5,0), linewidth=2) + 
+  geom_ribbon(alpha = .3, fill = rgb(1, .5,0)) +
+  theme_minimal(base_size = 22) +
+  geom_point(data = expC, color = rgb(0.54, 0.17, 0.89)) +
+  geom_pointrange(data = expC, color = rgb(0.54, 0.17, 0.89)) +
+  annotate("text",
+           x = 4,
+           y=expC$value, 
+           label = "e^c",
+           parse = TRUE, 
+           size = 12, 
+           color = rgb(0.54, 0.17, 0.89)) +
+  annotate("text",
+           x = 50,
+           y=1.03, 
+           label = "e^delta(x)",
+           parse = TRUE, 
+           size = 12,
+           color = rgb(1, .5,0)) +
+  labs(y="multiplicative factors",
+       x = "Age") 
+# theme(axis.text=element_text(size=14))
+
+ggsave("Figures/spain3.pdf",spain3)
+
+
+big_test |> 
   filter(years %in% c(2020,2021),
          type == "Exp Delta",
          !Country %in% c("Andorra","Bermuda","Faroe Islands",
@@ -187,7 +228,7 @@ big_test |>
          value > 1.5)
 
 deltas_all <-
-big_test |> 
+  big_test |> 
   filter(years %in% c(2020,2021),
          type == "Exp Delta",
          !Country %in% c("Andorra","Bermuda","Faroe Islands",
@@ -203,6 +244,34 @@ big_test |>
        x = "Age")
 
 ggsave("Figures/deltas_all.pdf",deltas_all)
+
+
+  big_test |> 
+  filter(years %in% c(2020,2021),
+         type %in%c("Exp Delta", "Exp c", "Obs Offset"),
+         ! Country %in% c("American Samoa","Andorra",
+                          "Antigua and Barbuda","Argentina","Armenia","Australia")) |> 
+    select(-up,-low) |> 
+    pivot_wider(names_from = "type", values_from = value) |> 
+    group_by(Country, Sex, years) |> 
+    mutate(has_excess = any(!is.na(`Exp c`))) |> 
+    ungroup() |> 
+    filter(has_excess) |> 
+    group_by(Country, Sex, years) |> 
+    mutate(Pop = sum(`Obs Offset`, na.rm = TRUE),
+           excess = `Exp c`[!is.na(`Exp c`)],
+           `Pop size` = if_else(Pop > 2e6,"> 3 Million","< 3 Million"),
+           excess = excess > 1) |>  
+    ungroup() |> 
+    filter(excess > .5) |> 
+  ggplot(aes(x = ages, y = `Exp Delta`, group = interaction(Sex,years,Country))) +
+  geom_line(alpha=.3) +
+  facet_wrap(excess~`Pop size`) +
+  theme_minimal(base_size = 22) +
+  ylim(.3,2) +
+  labs(y =  expression(e^{delta}),
+       x = "Age")
+
 
 big_test |> 
   filter(years %in% c(2020,2021),
