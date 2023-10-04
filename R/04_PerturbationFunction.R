@@ -152,7 +152,7 @@ fit_excess <- function(deaths.j, offset){
                             a=a,
                             E=E1,
                             WEIg=WEIg1,
-                            lambdas=OPT$par,
+                            lambdas=c(OPT$par[1],10^8),
                             verbose=TRUE,
                             kappa.shape=10^4,
                             infant=infantj)
@@ -175,7 +175,8 @@ fit_excess <- function(deaths.j, offset){
                                  a=a, E1=E1, obs.yrs=t1, 
                                  for.hor=max(t),
                                  ETA1hat=ETA1hat, deltas=deltasi, S=S, 
-                                 lambdas = OPT$par, verbose = TRUE,
+                                 #
+                                 lambdas = c(OPT$par[1],10^8), verbose = TRUE,
                                  infant = infantj,
                                  kappa.shape=10^4)
   ))
