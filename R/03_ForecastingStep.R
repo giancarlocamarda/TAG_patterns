@@ -128,7 +128,7 @@ cou[nocou]
 yescou <- 1:nc
 yescou <- yescou[-nocou]
 
-j=1
+j=2
 
 #pdf("ForecastFemales.pdf", width = 12, height = 10)
 #for(j in 1:nc){
@@ -184,41 +184,41 @@ Eg1 <- G%*%E1
 ## observed log-mortality, by age-groups, only for plotting and e0
 ETAg1 <- log(Yg1/Eg1)
 
-# ## plotting grouped actual log-mortality over ages
-# DFg <- expand.grid(list(ages=ag.low, years1=t1))
-# DFg$type <- "Actual grouped"
-# DFg$eta1 <- c(ETAg1)
-# DFg$ages.up <- ag.up+1
-# DFg$eta1.up <- c(ETAg1)
-# DFg$ag.lab <- factor(c(rep(ag.lab, n1)), levels = ag.lab)
-# ## over age-groups
-# p <- ggplot(DFg, aes(x=ages, y=eta1, color=type)) +
-#   geom_segment(data=filter(DFg, type=="Actual grouped"),
-#                aes(x=ages, y=eta1, xend=ages.up, yend=eta1.up))+
-#   facet_wrap(~years1, 2, 7, scales="free_y")+
-#   labs(x="age", y="log-mortality", title=cou.j)
-# p
-# ## over years
-# if(mg<=25){
-#   p <- ggplot(DFg, aes(x=years1, y=eta1)) +
-#     geom_point(data=filter(DFg, type=="Actual grouped"),
-#                aes(y=eta1, col=ag.lab))+
-#     facet_wrap(~ag.lab, 5, 5, scales="free_y")+
-#     theme(legend.position = "none") +
-#     scale_color_viridis(discrete=TRUE, option="inferno")+
-#     labs(x="year", y="log-mortality", title=cou.j)
-#   p
-# }else{
-#   DFgsel <- subset(DFg, ages%in%seq(0,90,10))
-#   p <- ggplot(DFgsel, aes(x=years1, y=eta1)) +
-#     geom_point(data=filter(DFgsel, type=="Actual grouped"),
-#                aes(y=eta1, col=ag.lab))+
-#     facet_wrap(~ag.lab, 2, 5, scales="free_y")+
-#     theme(legend.position = "none") +
-#     scale_color_viridis(discrete=TRUE, option="inferno")+
-#     labs(x="year", y="log-mortality", title=cou.j)
-#   p
-# }
+## plotting grouped actual log-mortality over ages
+DFg <- expand.grid(list(ages=ag.low, years1=t1))
+DFg$type <- "Actual grouped"
+DFg$eta1 <- c(ETAg1)
+DFg$ages.up <- ag.up+1
+DFg$eta1.up <- c(ETAg1)
+DFg$ag.lab <- factor(c(rep(ag.lab, n1)), levels = ag.lab)
+## over age-groups
+p <- ggplot(DFg, aes(x=ages, y=eta1, color=type)) +
+  geom_segment(data=filter(DFg, type=="Actual grouped"),
+               aes(x=ages, y=eta1, xend=ages.up, yend=eta1.up))+
+  facet_wrap(~years1, 2, 7, scales="free_y")+
+  labs(x="age", y="log-mortality", title=cou.j)
+p
+## over years
+if(mg<=25){
+  p <- ggplot(DFg, aes(x=years1, y=eta1)) +
+    geom_point(data=filter(DFg, type=="Actual grouped"),
+               aes(y=eta1, col=ag.lab))+
+    facet_wrap(~ag.lab, 5, 5, scales="free_y")+
+    theme(legend.position = "none") +
+    scale_color_viridis(discrete=TRUE, option="inferno")+
+    labs(x="year", y="log-mortality", title=cou.j)
+  p
+}else{
+  DFgsel <- subset(DFg, ages%in%seq(0,90,10))
+  p <- ggplot(DFgsel, aes(x=years1, y=eta1)) +
+    geom_point(data=filter(DFgsel, type=="Actual grouped"),
+               aes(y=eta1, col=ag.lab))+
+    facet_wrap(~ag.lab, 2, 5, scales="free_y")+
+    theme(legend.position = "none") +
+    scale_color_viridis(discrete=TRUE, option="inferno")+
+    labs(x="year", y="log-mortality", title=cou.j)
+  p
+}
 
 source("~/WORK/ConstrainedMortalityForecast/GroupedData/FUNCTIONS/GroupedSmoothConstrainedMortalityForecasting_Functions.R")
 
@@ -263,58 +263,58 @@ FITi <- PSinfantGrouped(a.low = ag.low,
 ## estimated/smooth log-mortality on the pre-pandemic years
 ETA1hat <- FITi$ETA
 
-# ## plotting, starting from the beginning
-# ## actual log-mortality
-# DFg <- expand.grid(list(ages=ag.low, years1=t1))
-# DFg$type <- "Actual grouped"
-# DFg$eta1 <- c(ETAg1)
-# DFg$ages.up <- ag.up+1
-# DFg$eta1.up <- c(ETAg1)
-# ## fitted
-# DFhat <- expand.grid(list(ages=a, years1=t1))
-# DFhat$type <- "Fitted"
-# DFhat$eta1 <- c(ETA1hat)
-# DFhat$ages.up <- NA
-# DFhat$eta1.up <- NA
-# ## all
-# DF <- rbind(DFg, DFhat)
-# DF$group <- factor(c(rep(ag.lab, n1), rep(rep(ag.lab, lg), n1)),
-#                    levels = ag.lab)
-# DF$colo <- c(rep(ag.mid, n1), rep(a, n1))
-# ## over age
-# p <- ggplot(DF, aes(x=ages, y=eta1, color=type)) +
-#   geom_segment(data=filter(DF, type=="Actual grouped"),
-#                aes(x=ages, y=eta1, xend=ages.up, yend=eta1.up))+
-#   geom_line(data=filter(DF, type=="Fitted"),
-#             aes(y=eta1),size=1)+
-#   facet_wrap(~years1, 2, 5)+
-#   labs(x="age", y="log-mortality", title=cou.j)
-# p
-# ## over years
-# if(mg<=25){
-#   p <- ggplot(DF, aes(x=years1, y=eta1)) +
-#     geom_line(data=filter(DF, type=="Fitted"),
-#               aes(y=eta1, col=colo, group=ages),size=1)+
-#     geom_point(data=filter(DF, type=="Actual grouped"),
-#                aes(y=eta1, col=colo))+
-#     facet_wrap(~group, 5, 5, scales="free_y")+
-#     theme(legend.position = "none") +
-#     scale_color_viridis(discrete=FALSE, option="inferno")+
-#     labs(x="year", y="log-mortality", title=cou.j)
-#   p
-# }else{
-#   DFsel <- subset(DF, ages%in%seq(0,90,10))
-#   p <- ggplot(DFsel, aes(x=years1, y=eta1)) +
-#     geom_line(data=filter(DFsel, type=="Fitted"),
-#               aes(y=eta1, col=colo, group=ages),size=1)+
-#     geom_point(data=filter(DFsel, type=="Actual grouped"),
-#                aes(y=eta1, col=colo))+
-#     facet_wrap(~group, 2, 5, scales="free_y")+
-#     theme(legend.position = "none") +
-#     scale_color_viridis(discrete=FALSE, option="inferno")+
-#     labs(x="year", y="log-mortality", title=cou.j)
-#   p
-# }
+## plotting, starting from the beginning
+## actual log-mortality
+DFg <- expand.grid(list(ages=ag.low, years1=t1))
+DFg$type <- "Actual grouped"
+DFg$eta1 <- c(ETAg1)
+DFg$ages.up <- ag.up+1
+DFg$eta1.up <- c(ETAg1)
+## fitted
+DFhat <- expand.grid(list(ages=a, years1=t1))
+DFhat$type <- "Fitted"
+DFhat$eta1 <- c(ETA1hat)
+DFhat$ages.up <- NA
+DFhat$eta1.up <- NA
+## all
+DF <- rbind(DFg, DFhat)
+DF$group <- factor(c(rep(ag.lab, n1), rep(rep(ag.lab, lg), n1)),
+                   levels = ag.lab)
+DF$colo <- c(rep(ag.mid, n1), rep(a, n1))
+## over age
+p <- ggplot(DF, aes(x=ages, y=eta1, color=type)) +
+  geom_segment(data=filter(DF, type=="Actual grouped"),
+               aes(x=ages, y=eta1, xend=ages.up, yend=eta1.up))+
+  geom_line(data=filter(DF, type=="Fitted"),
+            aes(y=eta1),size=1)+
+  facet_wrap(~years1, 2, 5)+
+  labs(x="age", y="log-mortality", title=cou.j)
+p
+## over years
+if(mg<=25){
+  p <- ggplot(DF, aes(x=years1, y=eta1)) +
+    geom_line(data=filter(DF, type=="Fitted"),
+              aes(y=eta1, col=colo, group=ages),size=1)+
+    geom_point(data=filter(DF, type=="Actual grouped"),
+               aes(y=eta1, col=colo))+
+    facet_wrap(~group, 5, 5, scales="free_y")+
+    theme(legend.position = "none") +
+    scale_color_viridis(discrete=FALSE, option="inferno")+
+    labs(x="year", y="log-mortality", title=cou.j)
+  p
+}else{
+  DFsel <- subset(DF, ages%in%seq(0,90,10))
+  p <- ggplot(DFsel, aes(x=years1, y=eta1)) +
+    geom_line(data=filter(DFsel, type=="Fitted"),
+              aes(y=eta1, col=colo, group=ages),size=1)+
+    geom_point(data=filter(DFsel, type=="Actual grouped"),
+               aes(y=eta1, col=colo))+
+    facet_wrap(~group, 2, 5, scales="free_y")+
+    theme(legend.position = "none") +
+    scale_color_viridis(discrete=FALSE, option="inferno")+
+    labs(x="year", y="log-mortality", title=cou.j)
+  p
+}
 ## FORECASTING STEP ## FORECASTING STEP ## FORECASTING STEP 
 ## where to apply the constraints
 S <- matrix(1, m, n)
